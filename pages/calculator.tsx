@@ -36,7 +36,7 @@ const runnerConfig = [{
   high: 1
 }]
 
-export const Calculator = () => {
+const Calculator = () => {
   const [mhr, setMhr] = useLocalStorage<number>({
     key: 'mhr',
     defaultValue: 190,
@@ -95,3 +95,5 @@ export const Calculator = () => {
     </div>
   )
 }
+
+export default Calculator
