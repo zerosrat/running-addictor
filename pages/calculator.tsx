@@ -2,7 +2,8 @@ import React, { useState }  from "react";
 import { NumberInput, Table, Flex, Space } from "@mantine/core";
 import { useLocalStorage } from '@mantine/hooks'
 
-const karvonenFormula = (mhr = 0, rhr = 0, percentage: number) => {
+const karvonenFormula = (mhr = 0, rhr = 0, percentage: number | undefined) => {
+  if (!percentage) return 0
   // 储备心率=静息心率+(最大心率-静息心率)*目标心率区间的百分比
   return rhr + (mhr - rhr) * percentage
 }
@@ -44,6 +45,15 @@ const Calculator = () => {
   const [rhr, setRhr] = useLocalStorage<number>({
     key: 'rhr',
     defaultValue: 60,
+  });
+
+  const [customZoneStart, setCustomZoneStart] = useLocalStorage<number>({
+    key: 'customZoneStart',
+    defaultValue: 0,
+  });
+  const [customZoneEnd, setCustomZoneEnd] = useLocalStorage<number>({
+    key: 'customZoneEnd',
+    defaultValue: 70,
   });
 
   const rows = runnerConfig.map((element) => {
@@ -90,7 +100,29 @@ const Calculator = () => {
             <th>Heart Rate</th>
           </tr>
         </thead>
-        <tbody>{rows}</tbody>
+        <tbody>
+          {rows}
+          <tr >
+            <td>custom</td>
+            <td style={{ display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+              <NumberInput
+                value={customZoneStart}
+                onChange={v => setCustomZoneStart(+v)}
+                hideControls
+                styles={{ input: { width: 42 } }}
+              />% - 
+              <NumberInput
+                value={customZoneEnd}
+                onChange={v => setCustomZoneEnd(+v)}
+                hideControls
+                styles={{ input: { width: 42 } }}
+              />%
+            </td>
+            <td>
+              {Math.round(karvonenFormula(mhr, rhr, customZoneStart * 0.01))} - 
+              {Math.round(karvonenFormula(mhr, rhr,customZoneEnd * 0.01))}</td>
+          </tr>
+        </tbody>
       </Table>
     </div>
   )
